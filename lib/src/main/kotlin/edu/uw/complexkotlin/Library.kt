@@ -3,13 +3,28 @@
  */
 package edu.uw.complexkotlin
 
+
 // write a lambda using map and fold to solve "FIZZBUZZ" for the first fifteen numbers (0..15).
 // use map() to return a list with "", "FIZZ" (for 3s) or "BUZZ" (for 5s).
 // use fold() to compress the array of strings down into a single string.
 // the final string should look like FIZZBUZZFIZZFIZZBUZZFIZZFIZZBUZZ for 0..15.
 // store this lambda into 'fizzbuzz' so that the tests can call it
 //
-val fizzbuzz : (IntRange) -> String = { "" }
+val fizzbuzz : (IntRange) -> String = { numbers ->
+    numbers.map { num ->
+        if (num % 3 == 0 && num % 5 == 0) {
+            "FIZZBUZZ"
+        } else if (num % 3 == 0) {
+            "FIZZ"
+        } else if (num % 5 == 0) {
+            "BUZZ"
+        } else {
+            ""
+        }
+    }.fold("") { fizzbuzzString, currentNum ->
+        fizzbuzzString + currentNum
+    }
+}
 
 // Example usage
 /*
@@ -34,16 +49,37 @@ fun process(message: String, block: (String) -> String): String {
     return ">>> ${message}: {" + block(message) + "}"
 }
 // Create r1 as a lambda that calls process() with message "FOO" and a block that returns "BAR"
-val r1 = { }
+val r1 = { process("FOO") { "BAR" } }
 
 // Create r2 as a lambda that calls process() with message "FOO" and a block that upper-cases 
 // r2_message, and repeats it three times with no spaces: "WOOGAWOOGAWOOGA"
 val r2_message = "wooga"
-val r2 = { }
+val r2 = { process("FOO") { r2_message.uppercase().repeat(3)} }
 
 
 // write an enum-based state machine between talking and thinking
-enum class Philosopher { }
+enum class Philosopher {
+    THINKING{
+        override fun toString(): String {
+            return "Deep thoughts...."
+        }
+            }, TALKING{
+        override fun toString(): String {
+            return "Allow me to suggest an idea..."
+        }
+            };
+    fun signal(): Philosopher{
+       if(this == THINKING){
+           return TALKING
+       } else {
+           return THINKING
+       }
+    }
+}
+/* According https://plato.stanford.edu/entries/seneca/, Senca was a major philosophical figure of the Roman Imperial Period.
+Senca was educated in rhetoric and philosophy in Rome and played a large role in Stoic philosiphy, especially in the renaissance era
+
+ */
 
 // create an class "Command" that can be used as a function.
 // To do this, provide an "invoke()" function that takes a 
@@ -55,4 +91,7 @@ enum class Philosopher { }
 // val cmd = Command(": ")
 // val result = cmd("Hello!")
 // result should equal ": Hello!"
-class Command(val prompt: String) { }
+class Command(val prompt: String) {
+    operator fun invoke(message: String): String{
+        return "$prompt$message"}
+}
